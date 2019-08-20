@@ -175,7 +175,7 @@ def run_generation(files, target_folder, target_name):
         cache.add_files(to_add)
 
     generated_units = UnityGenerator.generate(cache, target_folder, target_name)
-    cmake_string = cmake_separator.join(generated_units)
+    cmake_string = cmake_separator.join(generated_units).replace("\\", "/")
     sys.stdout.write(cmake_string)
 
     with open(cache_path, 'w') as file:

@@ -160,8 +160,13 @@ function(facelift_generate_code )
         list(APPEND BASE_CODEGEN_COMMAND "--all")
     endif()
 
+    # find_package(PythonInterp) causes some issues if the another version has been searched before, and it is not needed anyway on non-Win32 platforms
+    if(WIN32)
+        find_package(PythonInterp 3.0 REQUIRED)
+    endif()
+
     string(REPLACE ";" " " BASE_CODEGEN_COMMAND_WITH_SPACES "${BASE_CODEGEN_COMMAND}")
-    message("Calling facelift code generator. Command:\n PYTHONPATH=$ENV{PYTHONPATH} ${FACELIFT_PYTHON_EXECUTABLE} ${BASE_CODEGEN_COMMAND_WITH_SPACES}")
+    message("Calling facelift code generator. Command:\n PYTHONPATH=$ENV{PYTHONPATH} ${PYTHON_EXECUTABLE} ${BASE_CODEGEN_COMMAND_WITH_SPACES}")
 
     if(NOT DEFINED ENV{LANG}) # e.g. Qt Creator was started from the Apple Dock
         set(ENV{LANG} "en_US.UTF-8")
@@ -172,7 +177,7 @@ function(facelift_generate_code )
         set(LANG_SET_BY_FACELIFT false)
     endif()
 
-    execute_process(COMMAND ${FACELIFT_PYTHON_EXECUTABLE} ${BASE_CODEGEN_COMMAND}
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${BASE_CODEGEN_COMMAND}
         RESULT_VARIABLE CODEGEN_RETURN_CODE
         WORKING_DIRECTORY ${QFACE_BASE_LOCATION}/qface
         OUTPUT_VARIABLE CODEGEN_OUTPUT
