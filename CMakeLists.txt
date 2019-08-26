@@ -24,6 +24,9 @@ option(FACELIFT_BUILD_EXAMPLES "Enable build of examples" ON)
 option(FACELIFT_BUILD_TESTS "Enable build of tests" OFF)
 option(FACELIFT_ENABLE_DESKTOP_DEV_TOOLS "Enable desktop development tools" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries. If set to off, static libraries are built instead" ON)
+option(FACELIFT_BUILD_GTEST "Downloads and builds gtest and gmock. Embedding projects may want to turn it OFF" OFF)
+option(FACELIFT_USE_SYSTEM_GTEST "Uses gtest version installed in operating system" ON)
+option(FACELIFT_DISABLE_GTEST "Use this flag to prevent build unit tests based on googletest" OFF)
 
 if (FACELIFT_ENABLE_DBUS_IPC AND FACELIFT_DISABLE_DBUS_IPC)
     message(FATAL_ERROR "DBus IPC cannot be enabled and disabled at the same time.")
@@ -76,6 +79,31 @@ endif()
 
 if(FACELIFT_BUILD_TESTS)
     enable_testing()
+    if(${FACELIFT_BUILD_GTEST} AND NOT ${FACELIFT_DISABLE_GTEST})
+        configure_file(cmake/GTest.CMakeLists.txt.in googletest-download/CMakeLists.txt)
+        execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+          RESULT_VARIABLE result
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+        if(result)
+          message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+        endif()
+        execute_process(COMMAND ${CMAKE_COMMAND} --build .
+          RESULT_VARIABLE result
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+        if(result)
+          message(FATAL_ERROR "Build step for googletest failed: ${result}")
+        endif()
+
+        # Prevent overriding the parent project's compiler/linker
+        # settings on Windows
+        set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+        # Add googletest directly to our build. This defines
+        # the gtest and gtest_main targets.
+        add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+                         ${CMAKE_CURRENT_BINARY_DIR}/googletest-build
+                         EXCLUDE_FROM_ALL)
+    endif()
     add_subdirectory(tests)
 endif()
 
