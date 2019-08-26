@@ -1,6 +1,3 @@
 [submodule "qface"]
 	path = codegen/facelift/qface
 	url = ../qface.git
-[submodule "gtest"]
-	path = gtest
-	url = https://github.com/google/googletest.git
