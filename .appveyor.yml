@@ -46,6 +46,7 @@ install:
         doxygen --version
       }
 
+
 before_build:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: set PATH=C:\Python37-x64;%PATH%
@@ -58,8 +59,18 @@ before_build:
   - IF "%ARCHITECTURE%" == "x86" IF "%COMPILER%" == "MINGW_532" set PATH=C:\Qt\Tools\mingw530_32\bin;C:\Qt\5.11.3\mingw53_32\bin;%PATH%
 
 build_script:
+  - git clone https://github.com/google/googletest.git
+  - cd googletest
+  - mkdir build
+  - mkdir install
+  - set GTEST_INSTALL=%cd%\install
+  - cd build
+  - cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=%GTEST_INSTALL%
+  - ninja
+  - ninja install
+  - cd ..\..
   - mkdir build
   - cd build
-  - cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFACELIFT_BUILD_TESTS=%BUILD_TESTS% -DFACELIFT_DISABLE_GTEST=ON
+  - cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DFACELIFT_BUILD_TESTS=%BUILD_TESTS% -DFACELIFT_DISABLE_GTEST=OFF -DCMAKE_SYSTEM_PREFIX_PATH=%GTEST_INSTALL%
   - ninja
  # - if "%BUILD_TESTS%" == "true" (ctest) # when you want to run the tests, use this uncomment this line
