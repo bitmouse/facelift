@@ -57,7 +57,7 @@ public:
     }
 
     template<size_t size>
-    span(const std::array<ElementType, size>& array) :
+    span(std::array<ElementType, size>& array) :
         _M_array(array.begin()), _M_len(size)
     {
     }
