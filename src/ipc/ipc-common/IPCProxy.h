@@ -73,6 +73,9 @@ public:
                             }
                             proxyAdapterIPCBinder->connectToServer();
                             QObject::connect(proxyAdapterIPCBinder, &IPCProxyBinderBase::serviceAvailableChanged, this, &IPCProxy::refreshProvider);
+                            if (proxyAdapterIPCBinder->isServiceAvailable()) {
+                                break;
+                            }
                         }
                     }
                 }
