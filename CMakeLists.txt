@@ -1,3 +1,5 @@
+test commit
+
 cmake_minimum_required(VERSION 3.4 FATAL_ERROR)
 project(facelift VERSION 1.0.0)
 
